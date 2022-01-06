@@ -5,4 +5,5 @@ module.exports = {
 	DEBUG: require('./debug'),
 	BCON: require('./bcon'),
 	BHAV: require('./bhav'),
+	GLOB: require('./glob'),
 };

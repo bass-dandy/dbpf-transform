@@ -13,7 +13,7 @@ const typeIdToHandler = {
 	'4f424a66': () => {}, // OBJF
 	'4e524546': fileHandlers.NREF,
 	'856ddbac': () => {}, // JPEG
-	'474c4f42': () => {}, // GLOB
+	'474c4f42': fileHandlers.GLOB,
 };
 
 const reader = new BufferReader(

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const fileHandlers = require('./file-handlers');
+const BufferReader = require('./buffer-reader');
 
 const DIR_TYPE_ID = 'e86b1eef';
 
@@ -15,55 +16,37 @@ const typeIdToHandler = {
 	'474c4f42': () => {}, // GLOB
 };
 
-const fileBuf = fs.readFileSync('./Hayran_Computer_Engineering.package').buffer;
-
-function parseHeader(headerBuf) {
-	const header = new DataView(headerBuf);
-
-	return {
-		indexEntryCount: header.getUint32(36, true),
-		indexOffset: header.getUint32(40, true),
-		indexSize: header.getUint32(44, true),
-	};
-}
-
-const {
-	indexEntryCount,
-	indexOffset,
-	indexSize,
-} = parseHeader(fileBuf.slice(0, 96));
-
-function parseIndexTable(indexTableBuf) {
-	const indexedFiles = [];
-
-	for (let i = 0; i < indexEntryCount; i++) {
-		const start = i * 24;
-
-		const fileInfo = new DataView(
-			indexTableBuf.slice(start, start + 24)
-		);
-
-		indexedFiles.push({
-			typeId: fileInfo.getUint32(0, true).toString(16),
-			groupId: fileInfo.getUint32(4, true),
-			instanceId: fileInfo.getUint32(8, true),
-			instanceId2: fileInfo.getUint32(12, true),
-			location: fileInfo.getUint32(16, true),
-			size: fileInfo.getUint32(20, true),
-		});
-	}
-
-	return indexedFiles;
-}
-
-const indexedFiles = parseIndexTable(
-	fileBuf.slice(indexOffset, indexOffset + indexSize)
+const reader = new BufferReader(
+	fs.readFileSync('./Hayran_Computer_Engineering.package').buffer
 );
 
+// skip the first 36 bytes of the header as they're constant
+reader.seekTo(36);
+
+// parse header
+const indexEntryCount = reader.readUint32();
+const indexOffset = reader.readUint32();
+const indexSize = reader.readUint32();
+// skip the last bytes of the header as they're also constant
+
+// parse index table
+reader.seekTo(indexOffset);
+const indexedFiles = [];
+
+for (let i = 0; i < indexEntryCount; i++) {
+	indexedFiles.push({
+		typeId: reader.readUint32().toString(16),
+		groupId: reader.readUint32(),
+		instanceId: reader.readUint32(),
+		instanceId2: reader.readUint32(),
+		location: reader.readUint32(),
+		size: reader.readUint32(),
+	});
+}
+
+// deserialize files
 indexedFiles.forEach((fileInfo) => {
 	const { typeId, location, size } = fileInfo;
-
-	typeIdToHandler[typeId](
-		fileBuf.slice(location, location + size)
-	);
+	reader.seekTo(location);
+	typeIdToHandler[typeId](reader.readBuffer(size));
 });

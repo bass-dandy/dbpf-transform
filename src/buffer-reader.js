@@ -3,6 +3,14 @@ function BufferReader(buf) {
 	this.cursor = 0;
 }
 
+BufferReader.prototype.seekForward = function(distance) {
+	this.cursor += distance;
+};
+
+BufferReader.prototype.seekTo = function(index) {
+	this.cursor = index;
+};
+
 BufferReader.prototype.readUint8 = function() {
 	const int8 = this.view.getUint8(this.cursor, true);
 	this.cursor += 1;

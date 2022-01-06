@@ -6,4 +6,5 @@ module.exports = {
 	BCON: require('./bcon'),
 	BHAV: require('./bhav'),
 	GLOB: require('./glob'),
+	OBJF: require('./objf'),
 };

@@ -5,10 +5,12 @@ function BufferReader(buf) {
 
 BufferReader.prototype.seekForward = function(distance) {
 	this.cursor += distance;
+	return this;
 };
 
 BufferReader.prototype.seekTo = function(index) {
 	this.cursor = index;
+	return this;
 };
 
 BufferReader.prototype.readUint8 = function() {
@@ -17,10 +19,26 @@ BufferReader.prototype.readUint8 = function() {
 	return int8;
 };
 
+BufferReader.prototype.readUint8Array = function(len) {
+	const byteArray = [];
+	for (let i = 0; i < len; i++) {
+		byteArray.push(this.readUint8());
+	}
+	return byteArray;
+};
+
 BufferReader.prototype.readUint16 = function() {
 	const int16 = this.view.getUint16(this.cursor, true);
 	this.cursor += 2;
 	return int16;
+};
+
+BufferReader.prototype.readUint16Array = function(len) {
+	const int16Array = [];
+	for (let i = 0; i < len; i++) {
+		int16Array.push(this.readUint16());
+	}
+	return int16Array;
 };
 
 BufferReader.prototype.readUint32 = function() {
@@ -43,14 +61,6 @@ BufferReader.prototype.readUntilNull = function() {
 			return result;
 		}
 	}
-};
-
-BufferReader.prototype.readUint8Array = function(len) {
-	const byteArray = [];
-	for (let i = 0; i < len; i++) {
-		byteArray.push(this.readUint8());
-	}
-	return byteArray;
 };
 
 module.exports = BufferReader;

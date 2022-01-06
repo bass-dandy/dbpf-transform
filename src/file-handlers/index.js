@@ -7,4 +7,5 @@ module.exports = {
 	BHAV: require('./bhav'),
 	GLOB: require('./glob'),
 	OBJF: require('./objf'),
+	OBJD: require('./objd'),
 };

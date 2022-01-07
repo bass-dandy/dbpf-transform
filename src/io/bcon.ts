@@ -1,16 +1,8 @@
 import BufferReader from '../buffer-reader';
-
-export type BconFile = {
-	filename: string;
-	flag: boolean;
-	itemCount: number;
-	items: number[];
-};
+import type {BconContent} from '../types';
 
 /**
- * Deserialize BCON (behavior constants) files
- *
- * file format:
+ * BCON (behavior constants) file format:
  *
  * 66 byte header
  * - 64 byte file name
@@ -22,7 +14,7 @@ export type BconFile = {
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const bcon: BconFile = {
+	const bcon: BconContent = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),

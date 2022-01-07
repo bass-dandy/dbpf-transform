@@ -1,0 +1,16 @@
+export const TYPE_ID = {
+	BCON: '42434f4e',
+	BHAV: '42484156',
+	CTSS: '43545353',
+	GLOB: '474c4f42',
+	JPEG: '856ddbac',
+	NREF: '4e524546',
+	OBJD: '4f424a44',
+	OBJF: '4f424a66',
+	STR_: '53545223',
+	TPRP: '54505250',
+	TRCN: '5452434e',
+	TTAB: '54544142',
+	TTAS: '54544173',
+	VERS: 'ebfee342',
+};

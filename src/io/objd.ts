@@ -1,18 +1,10 @@
 import BufferReader from '../buffer-reader';
-
-export type ObjdFile = {
-	filename: string;
-	type: number;
-	guid: number;
-	proxyGuid: number;
-	originalGuid: number;
-	data: number[];
-};
+import type {ObjdContent} from '../types';
 
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const objd: ObjdFile = {
+	const objd: ObjdContent = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),

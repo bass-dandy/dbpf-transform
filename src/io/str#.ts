@@ -1,19 +1,10 @@
 import BufferReader from '../buffer-reader';
-
-export type StrFile = {
-	filename: string;
-	formatCode: number;
-	stringSetCount: number;
-	stringSets: {
-		value: string;
-		description: string;
-	}[];
-};
+import type {StrContent} from '../types';
 
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const str: StrFile = {
+	const str: StrContent = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),

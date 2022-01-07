@@ -1,30 +1,8 @@
 import BufferReader from '../buffer-reader';
-
-export type BhavInstruction = {
-	opcode: number;
-	addr1: number;
-	addr2: number;
-	nodeVersion: number;
-	operands: number[];
-};
-
-export type BhavFile = {
-	filename: string;
-	format: number;
-	count: number;
-	type: number;
-	argc: number;
-	locals: number;
-	headerFlag: number;
-	treeVersion: number;
-	cacheFlags: number;
-	instructions: BhavInstruction[];
-};
+import type {BhavContent, BhavInstruction} from '../types';
 
 /**
- * Deserialize BHAV files
- *
- * file format:
+ * BHAV file format:
  *
  * 76 or 77 byte header
  * - 64 byte filename
@@ -42,7 +20,7 @@ export type BhavFile = {
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const bhav: BhavFile = {
+	const bhav: BhavContent = {
 		filename: new TextDecoder().decode(reader.readBuffer(64)),
 		format: reader.readUint16(),
 		count: reader.readUint16(),

@@ -1,15 +1,10 @@
 import BufferReader from '../buffer-reader';
-
-export type GlobFile = {
-	filename: string;
-	length: number;
-	semiglobal: string;
-};
+import type {GlobContent} from '../types';
 
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const glob: GlobFile = {
+	const glob: GlobContent = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),

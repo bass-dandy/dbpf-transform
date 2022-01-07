@@ -1,4 +1,11 @@
-const BufferReader = require('../buffer-reader');
+import BufferReader from '../buffer-reader';
+
+export type BconFile = {
+	filename: string;
+	flag: boolean;
+	itemCount: number;
+	items: number[];
+};
 
 /**
  * Deserialize BCON (behavior constants) files
@@ -12,13 +19,15 @@ const BufferReader = require('../buffer-reader');
  *
  * rest of file is <item count> 2 byte items (might be signed in some contexts, eg motive deltas)
  */
-module.exports = (buf) => {
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const bcon = {
+	const bcon: BconFile = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),
+		flag: false,
+		itemCount: 0,
 		items: [],
 	};
 

@@ -1,4 +1,25 @@
-const BufferReader = require('../buffer-reader');
+import BufferReader from '../buffer-reader';
+
+export type BhavInstruction = {
+	opcode: number;
+	addr1: number;
+	addr2: number;
+	nodeVersion: number;
+	operands: number[];
+};
+
+export type BhavFile = {
+	filename: string;
+	format: number;
+	count: number;
+	type: number;
+	argc: number;
+	locals: number;
+	headerFlag: number;
+	treeVersion: number;
+	cacheFlags: number;
+	instructions: BhavInstruction[];
+};
 
 /**
  * Deserialize BHAV files
@@ -18,11 +39,11 @@ const BufferReader = require('../buffer-reader');
  *
  * rest of file is <instruction count> instructions
  */
-module.exports = (buf) => {
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const bhav = {
-		fname: new TextDecoder().decode(reader.readBuffer(64)),
+	const bhav: BhavFile = {
+		filename: new TextDecoder().decode(reader.readBuffer(64)),
 		format: reader.readUint16(),
 		count: reader.readUint16(),
 		type: reader.readUint8(),
@@ -39,8 +60,11 @@ module.exports = (buf) => {
 	}
 
 	while (bhav.instructions.length < bhav.count) {
-		const instruction = {
+		const instruction: BhavInstruction = {
 			opcode: reader.readUint16(),
+			addr1: 0,
+			addr2: 0,
+			nodeVersion: 0,
 			operands: [],
 		};
 
@@ -53,10 +77,8 @@ module.exports = (buf) => {
 		}
 
 		if (bhav.format < 0x8003) {
-			instruction.nodeVersion = 0;
 			instruction.operands = reader.readUint8Array(8);
 		} else if (bhav.format < 0x8005) {
-			instruction.nodeVersion = 0;
 			instruction.operands = reader.readUint8Array(16);
 		} else {
 			instruction.nodeVersion = reader.readUint8();

@@ -1,9 +1,18 @@
-const BufferReader = require('../buffer-reader');
+import BufferReader from '../buffer-reader';
 
-module.exports = (buf) => {
+export type ObjdFile = {
+	filename: string;
+	type: number;
+	guid: number;
+	proxyGuid: number;
+	originalGuid: number;
+	data: number[];
+};
+
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const objd = {
+	const objd: ObjdFile = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),
@@ -19,6 +28,7 @@ module.exports = (buf) => {
 		originalGuid: buf.byteLength >= 0xD0
 			? reader.seekTo(0xCC).readUint32()
 			: 0x00000000,
+		data: [],
 	};
 
 	reader.seekTo(64);

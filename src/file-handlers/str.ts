@@ -1,9 +1,19 @@
-const BufferReader = require('../buffer-reader');
+import BufferReader from '../buffer-reader';
 
-module.exports = (buf) => {
+export type StrFile = {
+	filename: string;
+	formatCode: number;
+	stringSetCount: number;
+	stringSets: {
+		value: string;
+		description: string;
+	}[];
+};
+
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const str = {
+	const str: StrFile = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),

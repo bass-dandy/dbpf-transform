@@ -1,12 +1,22 @@
-const BufferReader = require('../buffer-reader');
+import BufferReader from '../buffer-reader';
 
-module.exports = (buf) => {
+export type ObjfFile = {
+	filename: string;
+	count: number;
+	functions: {
+		guard: number;
+		action: number;
+	}[];
+};
+
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
-	const objf = {
+	const objf: ObjfFile = {
 		filename: new TextDecoder().decode(
 			reader.readBuffer(64)
 		),
+		count: 0,
 		functions: [],
 	};
 

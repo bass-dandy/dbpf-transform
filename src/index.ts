@@ -1,23 +1,11 @@
-const fs = require('fs');
-const fileHandlers = require('./file-handlers');
-const BufferReader = require('./buffer-reader');
+import {readFileSync} from 'fs';
+import {typeIdToHandler} from './file-handlers/index';
+import BufferReader from './buffer-reader';
 
 const DIR_TYPE_ID = 'e86b1eef';
 
-const typeIdToHandler = {
-	'53545223': fileHandlers['STR#'],
-	'43545353': fileHandlers.CTSS,
-	'42434f4e': fileHandlers.BCON,
-	'42484156': fileHandlers.BHAV,
-	'4f424a44': fileHandlers.OBJD,
-	'4f424a66': fileHandlers.OBJF,
-	'4e524546': fileHandlers.NREF,
-	'856ddbac': () => {}, // JPEG
-	'474c4f42': fileHandlers.GLOB,
-};
-
 const reader = new BufferReader(
-	fs.readFileSync('./Hayran_Computer_Engineering.package').buffer
+	readFileSync('./Hayran_Computer_Engineering.package').buffer
 );
 
 // skip the first 36 bytes of the header as they're constant
@@ -48,5 +36,5 @@ for (let i = 0; i < indexEntryCount; i++) {
 indexedFiles.forEach((fileInfo) => {
 	const { typeId, location, size } = fileInfo;
 	reader.seekTo(location);
-	typeIdToHandler[typeId](reader.readBuffer(size));
+	typeIdToHandler[typeId].deserialize(reader.readBuffer(size));
 });

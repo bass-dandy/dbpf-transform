@@ -55,6 +55,7 @@ export type StrContent = {
 	formatCode: number;
 	stringSetCount: number;
 	stringSets: {
+		languageId: number;
 		value: string;
 		description: string;
 	}[];

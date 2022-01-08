@@ -10,7 +10,7 @@ import * as OBJD from './objd';
 import * as OBJF from './objf';
 import * as STR_ from './str#';
 
-const DIR_TYPE_ID = 'e86b1eef';
+// const DIR_TYPE_ID = 'e86b1eef';
 
 function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 	switch(typeId) {
@@ -37,7 +37,7 @@ export function deserializePackage(buf: ArrayBuffer) {
 	// parse header
 	const indexEntryCount = reader.readUint32();
 	const indexOffset = reader.readUint32();
-	const indexSize = reader.readUint32();
+	// const indexSize = reader.readUint32();
 	// skip the last bytes of the header as they're also constant
 
 	// parse index table

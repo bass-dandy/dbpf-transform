@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "compile": "tsc",
-    "run": "ts-node ./src/index.ts"
+    "run": "ts-node ./src/index.ts",
+    "test": "jest"
   },
   "author": "bass_dandy",
   "license": "ISC",
@@ -13,7 +14,10 @@
     "qfs-compression": "^0.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   }

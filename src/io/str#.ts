@@ -38,9 +38,6 @@ export function deserialize(buf: ArrayBuffer) {
 			),
 		});
 	}
-	if (str.filename.includes('Attribute Labels')) {
-		console.log(str, str.filename.length);
-	}
 
 	return str;
 };

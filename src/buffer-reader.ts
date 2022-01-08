@@ -51,6 +51,14 @@ export default class BufferReader {
 		return int32;
 	}
 
+	readUint32Array(len: number) {
+		const int32Array = [];
+		for (let i = 0; i < len; i++) {
+			int32Array.push(this.readUint32());
+		}
+		return int32Array;
+	}
+
 	readBuffer(len: number) {
 		const buf = this.view.buffer.slice(this.cursor, this.cursor + len);
 		this.cursor += len;

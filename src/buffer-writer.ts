@@ -55,6 +55,16 @@ export default class BufferWriter {
 		this.buffer = view.buffer;
 	}
 
+	writeUint32Array(array: number[]) {
+		const end = this.buffer.byteLength;
+		this.appendBytes(array.length * 4);
+		const view = new DataView(this.buffer);
+		for(let i = 0; i < array.length; i++) {
+			view.setUint32(end + (i * 4), array[i], true);
+		}
+		this.buffer = view.buffer;
+	}
+
 	writeBuffer(buf: ArrayBuffer) {
 		const newBuffer = new Uint8Array(this.buffer.byteLength + buf.byteLength);
 		newBuffer.set(new Uint8Array(this.buffer), 0);

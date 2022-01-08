@@ -1,5 +1,10 @@
+const fs = require('fs/promises');
+
 expect.extend({
-	toMatchBuffer(r: ArrayBuffer, e: ArrayBuffer) {
+	async toMatchFile(r: ArrayBuffer, path: string) {
+		const matchFile = await fs.readFile(path);
+		const e = matchFile.buffer;
+
 		if (r.byteLength !== e.byteLength) {
 			return {
 				pass: false,

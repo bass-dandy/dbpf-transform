@@ -1,13 +1,8 @@
-import fs from 'fs/promises';
 import path from 'path';
 import {serialize} from './str#';
 
 describe('STR#', () => {
 	it('can serialize STR# files', async () => {
-		const validFile = await fs.readFile(
-			path.join(__dirname, 'fixtures/valid.str#')
-		);
-
 		const serializedFile = serialize({
 			filename: 'Attribute Labels',
 			formatCode: 65533,
@@ -23,6 +18,8 @@ describe('STR#', () => {
 			}],
 		});
 
-		expect(serializedFile).toMatchBuffer(validFile);
+		await expect(serializedFile).toMatchFile(
+			path.join(__dirname, 'fixtures/valid.str#')
+		);
 	});
 });

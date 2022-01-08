@@ -43,6 +43,7 @@ export type ObjdContent = {
 
 export type ObjfContent = {
 	filename: string;
+	header: number[];
 	count: number;
 	functions: {
 		guard: number;

@@ -13,13 +13,13 @@ import {
 } from '../types';
 import type {SimsFile, SimsFileMeta} from '../types';
 
-import * as BCON from './bcon';
-import * as BHAV from './bhav';
-import * as GLOB from './glob';
-import * as NREF from './nref';
-import * as OBJD from './objd';
-import * as OBJF from './objf';
-import * as STR_ from './str#';
+import * as BCON from '../bcon';
+import * as BHAV from '../bhav';
+import * as GLOB from '../glob';
+import * as NREF from '../nref';
+import * as OBJD from '../objd';
+import * as OBJF from '../objf';
+import * as STR_ from '../str#';
 
 // const DIR_TYPE_ID = 'e86b1eef';
 
@@ -40,7 +40,7 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 	}
 }
 
-export function deserializePackage(buf: ArrayBuffer) {
+export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	// skip the first 36 bytes of the header as they're constant
@@ -82,7 +82,7 @@ export function deserializePackage(buf: ArrayBuffer) {
 	return files;
 };
 
-export function serializePackage(files: SimsFile[]) {
+export function serialize(files: SimsFile[]) {
 	const writer = new BufferWriter();
 
 	// write file header

@@ -1,6 +1,8 @@
 import BufferReader from '../buffer-reader';
+import BufferWriter from '../buffer-writer';
 import type {ObjdContent} from '../types';
 
+// TODO: split data[] into something more meaningful
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
@@ -13,21 +15,31 @@ export function deserialize(buf: ArrayBuffer) {
 			: 0,
 		guid: buf.byteLength >= 0x60
 			? reader.seekTo(0x5C).readUint32()
-			: 0x00000000,
+			: 0,
 		proxyGuid: buf.byteLength >= 0x7E
 			? reader.seekTo(0x7A).readUint32()
-			: 0x00000000,
+			: 0,
 		originalGuid: buf.byteLength >= 0xD0
 			? reader.seekTo(0xCC).readUint32()
-			: 0x00000000,
+			: 0,
 		data: [],
 	};
 
 	reader.seekTo(64);
-
-	objd.data = reader.readUint16Array(
-		Math.floor((buf.byteLength - 64) / 2)
-	);
+	objd.data = reader.readUint8Array(buf.byteLength - 64);
 
 	return objd;
+};
+
+export function serialize(data: ObjdContent) {
+	const writer = new BufferWriter();
+	const encoder = new TextEncoder();
+
+	const encodedFilename = encoder.encode(data.filename);
+	writer.writeBuffer(encodedFilename);
+	writer.writeNulls(64 - encodedFilename.byteLength);
+
+	writer.writeUint8Array(data.data);
+
+	return writer.buffer;
 };

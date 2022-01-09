@@ -1,5 +1,6 @@
 export default class BufferWriter {
 	buffer: ArrayBuffer;
+	private encoder?: TextEncoder;
 
 	constructor() {
 		this.buffer = new ArrayBuffer(0);
@@ -70,6 +71,15 @@ export default class BufferWriter {
 		newBuffer.set(new Uint8Array(this.buffer), 0);
 		newBuffer.set(new Uint8Array(buf), this.buffer.byteLength);
 		this.buffer = newBuffer.buffer;
+	}
+
+	writeString(str: string) {
+		if (!this.encoder) {
+			this.encoder = new TextEncoder();
+		}
+		this.writeBuffer(
+			this.encoder.encode(str).buffer
+		);
 	}
 
 	writeNulls(count: number) {

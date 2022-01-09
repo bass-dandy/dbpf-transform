@@ -1,5 +1,16 @@
 import BufferReader from '../buffer-reader';
+import BufferWriter from '../buffer-writer';
 import {TYPE_ID} from '../consts';
+import {
+	isBconFile,
+	isBhavFile,
+	isGlobFile,
+	isObjdFile,
+	isObjfFile,
+	isStrFile,
+	isTxtFile,
+	isBinFile,
+} from '../types';
 import type {SimsFile, SimsFileMeta} from '../types';
 
 import * as BCON from './bcon';
@@ -55,22 +66,86 @@ export function deserializePackage(buf: ArrayBuffer) {
 		});
 	}
 
-	const filesByType: Record<string, SimsFile[]> = {};
+	const files: SimsFile[] = [];
 
 	// deserialize files
 	indexedFiles.forEach((meta) => {
 		reader.seekTo(meta.location);
 		const buffer = reader.readBuffer(meta.size);
 
-		if (!filesByType[meta.typeId]) {
-			filesByType[meta.typeId] = [];
-		}
-
-		filesByType[meta.typeId].push({
+		files.push({
 			meta,
 			content: deserializeFile(meta.typeId, buffer),
 		});
 	});
 
-	return filesByType;
-}
+	return files;
+};
+
+export function serializePackage(files: SimsFile[]) {
+	const writer = new BufferWriter();
+
+	// write file header
+	writer.writeString('DBPF');           // identifier
+	writer.writeUint32(1);                // major version
+	writer.writeUint32(1);                // minor version
+	writer.writeNulls(20);                // 12 unknown bytes, skip date modified + created
+	writer.writeUint32(7);                // index major version
+	writer.writeUint32(files.length);     // index entry count
+	writer.writeUint32(0);                // we'll need to come back later to write the index offset
+	writer.writeUint32(files.length * 24) // index table size
+	writer.writeNulls(12);                // skip hole count, offset, and size
+	writer.writeUint32(2);                // index minor version
+	writer.writeNulls(32);                // rest of header is blank / reserved for future versions
+
+	// write files and track meta for index table
+	const indexTable: SimsFileMeta[] = [];
+
+	files.forEach((file) => {
+		let serializedFile = new ArrayBuffer(0);
+
+		if (isBconFile(file)) {
+			serializedFile = BCON.serialize(file.content);
+		} else if (isBhavFile(file)) {
+			serializedFile = BHAV.serialize(file.content);
+		} else if (isGlobFile(file)) {
+			serializedFile = GLOB.serialize(file.content);
+		} else if (isObjdFile(file)) {
+			serializedFile = OBJD.serialize(file.content);
+		} else if (isObjfFile(file)) {
+			serializedFile = OBJF.serialize(file.content);
+		} else if (isStrFile(file)) {
+			serializedFile = STR_.serialize(file.content);
+		} else if (isTxtFile(file)) {
+			serializedFile = new TextEncoder().encode(file.content).buffer;
+		} else if (isBinFile(file)) {
+			serializedFile = file.content;
+		}
+
+		indexTable.push({
+			...file.meta,
+			location: writer.buffer.byteLength,
+			size: serializedFile.byteLength,
+		});
+
+		writer.writeBuffer(serializedFile);
+	});
+
+	// write index table
+	const indexOffset = writer.buffer.byteLength;
+
+	indexTable.forEach((meta) => {
+		writer.writeUint32(parseInt(meta.typeId, 16));
+		writer.writeUint32(meta.groupId);
+		writer.writeUint32(meta.instanceId);
+		writer.writeUint32(meta.instanceId2);
+		writer.writeUint32(meta.location);
+		writer.writeUint32(meta.size);
+	});
+
+	// lastly, go back to the header and write the index offset
+	const view = new DataView(writer.buffer);
+	view.setUint32(40, indexOffset, true);
+
+	return view.buffer;
+};

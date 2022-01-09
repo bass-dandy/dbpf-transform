@@ -1,3 +1,5 @@
+import {TYPE_ID} from './consts';
+
 export type BconContent = {
 	filename: string;
 	flag: boolean;
@@ -83,3 +85,75 @@ export type SimsFile = {
 		| ArrayBuffer
 		| string;
 };
+
+export type BconFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.BCON; };
+	content: BconContent;
+};
+
+export function isBconFile(file: SimsFile): file is BconFile {
+	return file.meta.typeId === TYPE_ID.BCON;
+}
+
+export type BhavFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.BHAV; };
+	content: BhavContent;
+};
+
+export function isBhavFile(file: SimsFile): file is BhavFile {
+	return file.meta.typeId === TYPE_ID.BHAV;
+}
+
+export type GlobFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.GLOB; };
+	content: GlobContent;
+};
+
+export function isGlobFile(file: SimsFile): file is GlobFile {
+	return file.meta.typeId === TYPE_ID.GLOB;
+}
+
+export type ObjdFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.OBJD; };
+	content: ObjdContent;
+};
+
+export function isObjdFile(file: SimsFile): file is ObjdFile {
+	return file.meta.typeId === TYPE_ID.OBJD;
+}
+
+export type ObjfFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.OBJF; };
+	content: ObjfContent;
+};
+
+export function isObjfFile(file: SimsFile): file is ObjfFile {
+	return file.meta.typeId === TYPE_ID.OBJF;
+}
+
+export type StrFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.STR_ | typeof TYPE_ID.CTSS; };
+	content: StrContent;
+};
+
+export function isStrFile(file: SimsFile): file is StrFile {
+	return file.meta.typeId === TYPE_ID.STR_ || file.meta.typeId === TYPE_ID.CTSS;
+}
+
+export type TxtFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.NREF; };
+	content: string;
+};
+
+export function isTxtFile(file: SimsFile): file is TxtFile {
+	return file.meta.typeId === TYPE_ID.NREF;
+}
+
+export type BinFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.JPEG; };
+	content: ArrayBuffer;
+};
+
+export function isBinFile(file: SimsFile): file is BinFile {
+	return file.meta.typeId === TYPE_ID.JPEG;
+}

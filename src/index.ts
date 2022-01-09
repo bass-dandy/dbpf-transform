@@ -1,8 +1,9 @@
-import {readFileSync} from 'fs';
+import fs from 'fs/promises';
 import {deserializePackage} from './io';
 
-const filesByType = deserializePackage(
-	readFileSync('./Hayran_Computer_Engineering.package').buffer
-);
+async function main() {
+	const inFile = await fs.readFile('./out.package');
+	return deserializePackage(inFile.buffer);
+}
 
-console.log(filesByType);
+main();

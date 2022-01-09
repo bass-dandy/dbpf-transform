@@ -1,6 +1,3 @@
-import BufferReader from '../buffer-reader';
-import type {BconContent} from '../types';
-
 /**
  * BCON (behavior constants) file format:
  *
@@ -11,6 +8,10 @@ import type {BconContent} from '../types';
  *
  * rest of file is <item count> 2 byte items (might be signed in some contexts, eg motive deltas)
  */
+import BufferReader from '../buffer-reader';
+import BufferWriter from '../buffer-writer';
+import type {BconContent} from '../types';
+
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
@@ -32,4 +33,24 @@ export function deserialize(buf: ArrayBuffer) {
 	}
 
 	return bcon;
+};
+
+export function serialize(data: BconContent) {
+	const writer = new BufferWriter();
+	const encoder = new TextEncoder();
+
+	const encodedFilename = encoder.encode(data.filename);
+	writer.writeBuffer(encodedFilename);
+	writer.writeNulls(64 - encodedFilename.byteLength);
+
+	let flagAndCount = data.itemCount;
+
+	if (data.flag) {
+		flagAndCount |= 0b1000000000000000;
+	}
+
+	writer.writeUint16(flagAndCount);
+	writer.writeUint16Array(data.items);
+
+	return writer.buffer;
 };

@@ -113,6 +113,15 @@ export function isGlobFile(file: SimsFile): file is GlobFile {
 	return file.meta.typeId === TYPE_ID.GLOB;
 }
 
+export type NrefFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.NREF; };
+	content: string;
+};
+
+export function isNrefFile(file: SimsFile): file is NrefFile {
+	return file.meta.typeId === TYPE_ID.NREF;
+}
+
 export type ObjdFile = SimsFile & {
 	meta: SimsFileMeta & { typeId: typeof TYPE_ID.OBJD; };
 	content: ObjdContent;
@@ -137,23 +146,18 @@ export type StrFile = SimsFile & {
 };
 
 export function isStrFile(file: SimsFile): file is StrFile {
-	return file.meta.typeId === TYPE_ID.STR_ || file.meta.typeId === TYPE_ID.CTSS;
+	return file.meta.typeId === TYPE_ID.STR_
+		|| file.meta.typeId === TYPE_ID.CTSS
+		|| file.meta.typeId === TYPE_ID.TTAS;
 }
 
-export type TxtFile = SimsFile & {
-	meta: SimsFileMeta & { typeId: typeof TYPE_ID.NREF; };
-	content: string;
-};
-
-export function isTxtFile(file: SimsFile): file is TxtFile {
-	return file.meta.typeId === TYPE_ID.NREF;
-}
-
-export type BinFile = SimsFile & {
-	meta: SimsFileMeta & { typeId: typeof TYPE_ID.JPEG; };
-	content: ArrayBuffer;
-};
+export type BinFile = SimsFile & { content: ArrayBuffer; };
 
 export function isBinFile(file: SimsFile): file is BinFile {
-	return file.meta.typeId === TYPE_ID.JPEG;
+	Object.values(TYPE_ID).forEach((typeId) => {
+		if (file.meta.typeId === typeId) {
+			return false;
+		}
+	});
+	return true;
 }

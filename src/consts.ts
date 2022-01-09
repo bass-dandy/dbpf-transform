@@ -3,7 +3,6 @@ export const TYPE_ID = {
 	BHAV: '42484156',
 	CTSS: '43545353',
 	GLOB: '474c4f42',
-	JPEG: '856ddbac',
 	NREF: '4e524546',
 	OBJD: '4f424a44',
 	OBJF: '4f424a66',

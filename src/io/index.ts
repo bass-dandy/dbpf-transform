@@ -8,7 +8,7 @@ import {
 	isObjdFile,
 	isObjfFile,
 	isStrFile,
-	isTxtFile,
+	isNrefFile,
 	isBinFile,
 } from '../types';
 import type {SimsFile, SimsFileMeta} from '../types';
@@ -27,15 +27,16 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 	switch(typeId) {
 		case TYPE_ID.BCON: return BCON.deserialize(buffer);
 		case TYPE_ID.BHAV: return BHAV.deserialize(buffer);
-		case TYPE_ID.CTSS: return STR_.deserialize(buffer);
 		case TYPE_ID.GLOB: return GLOB.deserialize(buffer);
 		case TYPE_ID.NREF: return NREF.deserialize(buffer);
 		case TYPE_ID.OBJD: return OBJD.deserialize(buffer);
 		case TYPE_ID.OBJF: return OBJF.deserialize(buffer);
-		case TYPE_ID.STR_: return STR_.deserialize(buffer);
-		case TYPE_ID.JPEG: return buffer;
+		case TYPE_ID.STR_:
+		case TYPE_ID.CTSS:
+		case TYPE_ID.TTAS: return STR_.deserialize(buffer);
 		default:
 			console.log(`No handler for file with typeId ${typeId}`);
+			return buffer;
 	}
 }
 
@@ -48,7 +49,6 @@ export function deserializePackage(buf: ArrayBuffer) {
 	// parse header
 	const indexEntryCount = reader.readUint32();
 	const indexOffset = reader.readUint32();
-	// const indexSize = reader.readUint32();
 	// skip the last bytes of the header as they're also constant
 
 	// parse index table
@@ -110,14 +110,14 @@ export function serializePackage(files: SimsFile[]) {
 			serializedFile = BHAV.serialize(file.content);
 		} else if (isGlobFile(file)) {
 			serializedFile = GLOB.serialize(file.content);
+		} else if (isNrefFile(file)) {
+			serializedFile = new TextEncoder().encode(file.content).buffer;
 		} else if (isObjdFile(file)) {
 			serializedFile = OBJD.serialize(file.content);
 		} else if (isObjfFile(file)) {
 			serializedFile = OBJF.serialize(file.content);
 		} else if (isStrFile(file)) {
 			serializedFile = STR_.serialize(file.content);
-		} else if (isTxtFile(file)) {
-			serializedFile = new TextEncoder().encode(file.content).buffer;
 		} else if (isBinFile(file)) {
 			serializedFile = file.content;
 		}

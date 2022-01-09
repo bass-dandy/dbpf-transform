@@ -1,9 +1,11 @@
 import fs from 'fs/promises';
-import {deserializePackage} from './io';
+import {deserializePackage, serializePackage} from './io';
 
 async function main() {
-	const inFile = await fs.readFile('./out.package');
-	return deserializePackage(inFile.buffer);
+	const inPackage = await fs.readFile('./Hayran_Computer_Engineering.package');
+	const files = deserializePackage(inPackage.buffer);
+	const outPackage = serializePackage(files);
+	await fs.writeFile('./out.package', Buffer.from(outPackage));
 }
 
 main();

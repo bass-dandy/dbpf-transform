@@ -1,6 +1,3 @@
-import BufferReader from '../buffer-reader';
-import type {BhavContent, BhavInstruction} from '../types';
-
 /**
  * BHAV file format:
  *
@@ -17,6 +14,10 @@ import type {BhavContent, BhavInstruction} from '../types';
  *
  * rest of file is <instruction count> instructions
  */
+import BufferReader from '../buffer-reader';
+import BufferWriter from '../buffer-writer';
+import type {BhavContent, BhavInstruction} from '../types';
+
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
@@ -67,4 +68,48 @@ export function deserialize(buf: ArrayBuffer) {
 	}
 
 	return bhav;
+};
+
+export function serialize(data: BhavContent) {
+	const writer = new BufferWriter();
+	const encoder = new TextEncoder();
+
+	const encodedFilename = encoder.encode(data.filename);
+	writer.writeBuffer(encodedFilename);
+	writer.writeNulls(64 - encodedFilename.byteLength);
+
+	writer.writeUint16(data.format);
+	writer.writeUint16(data.count);
+	writer.writeUint8(data.type);
+	writer.writeUint8(data.argc);
+	writer.writeUint8(data.locals);
+	writer.writeUint8(data.headerFlag);
+	writer.writeUint32(data.treeVersion);
+
+	if (data.format > 0x8008) {
+		writer.writeUint8(data.cacheFlags);
+	}
+
+	for(let i = 0; i < data.count; i++) {
+		const instruction = data.instructions[i];
+
+		writer.writeUint16(instruction.opcode);
+
+		if (data.format < 0x8007) {
+			writer.writeUint8(instruction.addr1);
+			writer.writeUint8(instruction.addr2);
+		} else {
+			writer.writeUint16(instruction.addr1);
+			writer.writeUint16(instruction.addr2);
+		}
+
+		if (data.format < 0x8005) {
+			writer.writeUint8Array(instruction.operands);
+		} else {
+			writer.writeUint8(instruction.nodeVersion);
+			writer.writeUint8Array(instruction.operands);
+		}
+	}
+
+	return writer.buffer;
 };

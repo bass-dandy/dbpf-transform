@@ -1,5 +1,5 @@
 import path from 'path';
-import {serialize} from './str#';
+import {serialize} from './str';
 
 describe('STR#', () => {
 	it('can serialize STR# files', async () => {
@@ -19,7 +19,7 @@ describe('STR#', () => {
 		});
 
 		await expect(serializedFile).toMatchFile(
-			path.join(__dirname, 'fixtures/valid.str#')
+			path.join(__dirname, 'fixtures/valid.str')
 		);
 	});
 });

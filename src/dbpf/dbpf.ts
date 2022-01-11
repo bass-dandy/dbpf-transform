@@ -19,7 +19,7 @@ import * as GLOB from '../glob';
 import * as NREF from '../nref';
 import * as OBJD from '../objd';
 import * as OBJF from '../objf';
-import * as STR_ from '../str#';
+import * as STR_ from '../str';
 
 // const DIR_TYPE_ID = 'e86b1eef';
 

@@ -141,12 +141,12 @@ export function isObjfFile(file: SimsFile): file is ObjfFile {
 }
 
 export type StrFile = SimsFile & {
-	meta: SimsFileMeta & { typeId: typeof TYPE_ID.STR_ | typeof TYPE_ID.CTSS; };
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.STR | typeof TYPE_ID.CTSS; };
 	content: StrContent;
 };
 
 export function isStrFile(file: SimsFile): file is StrFile {
-	return file.meta.typeId === TYPE_ID.STR_
+	return file.meta.typeId === TYPE_ID.STR
 		|| file.meta.typeId === TYPE_ID.CTSS
 		|| file.meta.typeId === TYPE_ID.TTAS;
 }

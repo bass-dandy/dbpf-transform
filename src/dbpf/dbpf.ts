@@ -1,6 +1,6 @@
 import BufferReader from '../buffer-reader';
 import BufferWriter from '../buffer-writer';
-import {TYPE_ID} from '../consts';
+import {TYPE_ID, getFileType} from '../consts';
 import {
 	isBconFile,
 	isBhavFile,
@@ -19,7 +19,7 @@ import * as GLOB from '../glob';
 import * as NREF from '../nref';
 import * as OBJD from '../objd';
 import * as OBJF from '../objf';
-import * as STR_ from '../str';
+import * as STR  from '../str';
 
 // const DIR_TYPE_ID = 'e86b1eef';
 
@@ -31,11 +31,11 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 		case TYPE_ID.NREF: return NREF.deserialize(buffer);
 		case TYPE_ID.OBJD: return OBJD.deserialize(buffer);
 		case TYPE_ID.OBJF: return OBJF.deserialize(buffer);
-		case TYPE_ID.STR_:
+		case TYPE_ID.STR:
 		case TYPE_ID.CTSS:
-		case TYPE_ID.TTAS: return STR_.deserialize(buffer);
+		case TYPE_ID.TTAS: return STR.deserialize(buffer);
 		default:
-			console.log(`No handler for file with typeId ${typeId}`);
+			console.log(`No handler for file with typeId ${typeId} (${getFileType(typeId)})`);
 			return buffer;
 	}
 }
@@ -117,7 +117,7 @@ export function serialize(files: SimsFile[]) {
 		} else if (isObjfFile(file)) {
 			serializedFile = OBJF.serialize(file.content);
 		} else if (isStrFile(file)) {
-			serializedFile = STR_.serialize(file.content);
+			serializedFile = STR.serialize(file.content);
 		} else if (isBinFile(file)) {
 			serializedFile = file.content;
 		}

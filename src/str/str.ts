@@ -19,9 +19,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const decoder = new TextDecoder();
 
 	const str: StrContent = {
-		filename: decoder.decode(
-			reader.readBuffer(64)
-		),
+		filename: reader.readFileName(),
 		formatCode: reader.readUint16(),
 		stringSetCount: reader.readUint16(),
 		stringSets: [],

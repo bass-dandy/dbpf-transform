@@ -16,9 +16,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	const bcon: BconContent = {
-		filename: new TextDecoder().decode(
-			reader.readBuffer(64)
-		),
+		filename: reader.readFileName(),
 		flag: false,
 		itemCount: 0,
 		items: [],

@@ -7,9 +7,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	const objd: ObjdContent = {
-		filename: new TextDecoder().decode(
-			reader.readBuffer(64)
-		),
+		filename: reader.readFileName(),
 		type: buf.byteLength >= 0x54
 			? reader.seekTo(0x52).readUint16()
 			: 0,

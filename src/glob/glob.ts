@@ -13,9 +13,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	const glob: GlobContent = {
-		filename: new TextDecoder().decode(
-			reader.readBuffer(64)
-		),
+		filename: reader.readFileName(),
 		length: reader.readUint8(),
 		semiglobal: '',
 	};

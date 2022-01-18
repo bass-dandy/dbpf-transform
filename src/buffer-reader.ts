@@ -65,6 +65,12 @@ export default class BufferReader {
 		return buf;
 	}
 
+	readFileName() {
+		return new TextDecoder().decode(
+			this.readBuffer(64)
+		).replace(/\u0000/g, ''); // remove trailing null bytes
+	}
+
 	readUntilNull() {
 		for (let i = this.cursor; i < this.view.byteLength; i++) {
 			if (this.view.getUint8(i) === 0) {

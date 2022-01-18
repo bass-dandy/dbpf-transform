@@ -17,9 +17,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	const objf: ObjfContent = {
-		filename: new TextDecoder().decode(
-			reader.readBuffer(64)
-		),
+		filename: reader.readFileName(),
 		header: reader.readUint32Array(3),
 		count: reader.readUint32(),
 		functions: [],

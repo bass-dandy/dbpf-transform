@@ -22,7 +22,7 @@ export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
 
 	const bhav: BhavContent = {
-		filename: new TextDecoder().decode(reader.readBuffer(64)),
+		filename: reader.readFileName(),
 		format: reader.readUint16(),
 		count: reader.readUint16(),
 		type: reader.readUint8(),

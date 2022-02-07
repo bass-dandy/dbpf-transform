@@ -6,7 +6,6 @@
 		"preserveConstEnums": true,
 		"strict": true,
 		"baseUrl": "./src",
-		"noEmit": true,
 		"moduleResolution": "node",
 		"typeRoots": ["./node_modules/@types", "./src/typings"],
 		"noUnusedParameters": true,

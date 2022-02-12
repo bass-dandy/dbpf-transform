@@ -73,17 +73,19 @@ export type SimsFileMeta = {
 	size: number;
 };
 
+export type SimsFileContent =
+	| BconContent
+	| BhavContent
+	| GlobContent
+	| ObjdContent
+	| ObjfContent
+	| StrContent
+	| ArrayBuffer
+	| string;
+
 export type SimsFile = {
 	meta: SimsFileMeta;
-	content?:
-		| BconContent
-		| BhavContent
-		| GlobContent
-		| ObjdContent
-		| ObjfContent
-		| StrContent
-		| ArrayBuffer
-		| string;
+	content?: SimsFileContent;
 };
 
 export type BconFile = SimsFile & {

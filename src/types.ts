@@ -64,6 +64,21 @@ export type StrContent = {
 	}[];
 };
 
+export type TrcnContent = {
+	filename: string;
+	header: number[];
+	itemCount: number;
+	items: {
+		used: number;
+		id: number;
+		name: string;
+		desc: string;
+		value: number;
+		minValue: number;
+		maxValue: number;
+	}[];
+};
+
 export type SimsFileMeta = {
 	typeId: string;
 	groupId: number;
@@ -80,6 +95,7 @@ export type SimsFileContent =
 	| ObjdContent
 	| ObjfContent
 	| StrContent
+	| TrcnContent
 	| ArrayBuffer
 	| string;
 
@@ -146,6 +162,15 @@ export type StrFile = SimsFile & {
 	meta: SimsFileMeta & { typeId: typeof TYPE_ID.STR | typeof TYPE_ID.CTSS; };
 	content: StrContent;
 };
+
+export type TrcnFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.TRCN; };
+	content: TrcnContent;
+};
+
+export function isTrcnFile(file: SimsFile): file is TrcnFile {
+	return file.meta.typeId === TYPE_ID.TRCN;
+}
 
 export function isStrFile(file: SimsFile): file is StrFile {
 	return file.meta.typeId === TYPE_ID.STR

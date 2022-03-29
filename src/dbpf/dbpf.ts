@@ -8,6 +8,7 @@ import {
 	isObjdFile,
 	isObjfFile,
 	isStrFile,
+	isTprpFile,
 	isTrcnFile,
 	isNrefFile,
 	isBinFile,
@@ -21,6 +22,7 @@ import * as NREF from '../nref';
 import * as OBJD from '../objd';
 import * as OBJF from '../objf';
 import * as STR  from '../str';
+import * as TPRP from '../tprp';
 import * as TRCN from '../trcn';
 
 // const DIR_TYPE_ID = 'e86b1eef';
@@ -33,6 +35,7 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 		case TYPE_ID.NREF: return NREF.deserialize(buffer);
 		case TYPE_ID.OBJD: return OBJD.deserialize(buffer);
 		case TYPE_ID.OBJF: return OBJF.deserialize(buffer);
+		case TYPE_ID.TPRP: return TPRP.deserialize(buffer);
 		case TYPE_ID.TRCN: return TRCN.deserialize(buffer);
 		case TYPE_ID.STR:
 		case TYPE_ID.CTSS:
@@ -121,6 +124,8 @@ export function serialize(files: SimsFile[]) {
 			serializedFile = OBJF.serialize(file.content);
 		} else if (isStrFile(file)) {
 			serializedFile = STR.serialize(file.content);
+		} else if (isTprpFile(file)) {
+			serializedFile = TPRP.serialize(file.content);
 		} else if (isTrcnFile(file)) {
 			serializedFile = TRCN.serialize(file.content);
 		} else if (isBinFile(file)) {

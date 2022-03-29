@@ -64,6 +64,17 @@ export type StrContent = {
 	}[];
 };
 
+export type TprpContent = {
+	filename: string;
+	header: number[];
+	params: {
+		label: string;
+		pdata: number;
+	}[];
+	locals: string[];
+	trailer: number[];
+};
+
 export type TrcnContent = {
 	filename: string;
 	header: number[];
@@ -95,6 +106,7 @@ export type SimsFileContent =
 	| ObjdContent
 	| ObjfContent
 	| StrContent
+	| TprpContent
 	| TrcnContent
 	| ArrayBuffer
 	| string;
@@ -163,10 +175,20 @@ export type StrFile = SimsFile & {
 	content: StrContent;
 };
 
+export type TprpFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.TPRP; };
+	content: TprpContent;
+};
+
+export function isTprpFile(file: SimsFile): file is TprpFile {
+	return file.meta.typeId === TYPE_ID.TPRP;
+}
+
 export type TrcnFile = SimsFile & {
 	meta: SimsFileMeta & { typeId: typeof TYPE_ID.TRCN; };
 	content: TrcnContent;
 };
+
 
 export function isTrcnFile(file: SimsFile): file is TrcnFile {
 	return file.meta.typeId === TYPE_ID.TRCN;

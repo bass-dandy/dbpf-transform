@@ -10,6 +10,7 @@ import {
 	isStrFile,
 	isTprpFile,
 	isTrcnFile,
+	isTtabFile,
 	isNrefFile,
 	isBinFile,
 } from '../types';
@@ -22,6 +23,7 @@ import * as NREF from '../nref';
 import * as OBJD from '../objd';
 import * as OBJF from '../objf';
 import * as STR  from '../str';
+import * as TTAB from '../ttab';
 import * as TPRP from '../tprp';
 import * as TRCN from '../trcn';
 
@@ -35,6 +37,7 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 		case TYPE_ID.NREF: return NREF.deserialize(buffer);
 		case TYPE_ID.OBJD: return OBJD.deserialize(buffer);
 		case TYPE_ID.OBJF: return OBJF.deserialize(buffer);
+		case TYPE_ID.TTAB: return TTAB.deserialize(buffer);
 		case TYPE_ID.TPRP: return TPRP.deserialize(buffer);
 		case TYPE_ID.TRCN: return TRCN.deserialize(buffer);
 		case TYPE_ID.STR:
@@ -124,6 +127,8 @@ export function serialize(files: SimsFile[]) {
 			serializedFile = OBJF.serialize(file.content);
 		} else if (isStrFile(file)) {
 			serializedFile = STR.serialize(file.content);
+		} else if (isTtabFile(file)) {
+			serializedFile = TTAB.serialize(file.content);
 		} else if (isTprpFile(file)) {
 			serializedFile = TPRP.serialize(file.content);
 		} else if (isTrcnFile(file)) {

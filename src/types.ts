@@ -64,6 +64,38 @@ export type StrContent = {
 	}[];
 };
 
+export type TtabMotiveTable = {
+	groups: {
+		items: (
+			number | { values: number[] }
+		)[];
+	}[];
+};
+
+export type TtabContent = {
+	filename: string;
+	header: number[];
+	items: {
+		action: number;
+		guard: number;
+		counts?: number[];
+		flags: number;
+		flags2: number;
+		strIndex: number;
+		attenuationCode: number;
+		attenuationValue: number;
+		autonomy: number;
+		joinIndex: number;
+		uiDisplayType: number;
+		facialAnimation: number;
+		memoryIterMult: number;
+		objectType: number;
+		modelTableId: number;
+		humanGroups: TtabMotiveTable;
+		animalGroups: TtabMotiveTable | null;
+	}[];
+};
+
 export type TprpContent = {
 	filename: string;
 	header: number[];
@@ -106,6 +138,7 @@ export type SimsFileContent =
 	| ObjdContent
 	| ObjfContent
 	| StrContent
+	| TtabContent
 	| TprpContent
 	| TrcnContent
 	| ArrayBuffer
@@ -175,6 +208,21 @@ export type StrFile = SimsFile & {
 	content: StrContent;
 };
 
+export function isStrFile(file: SimsFile): file is StrFile {
+	return file.meta.typeId === TYPE_ID.STR
+		|| file.meta.typeId === TYPE_ID.CTSS
+		|| file.meta.typeId === TYPE_ID.TTAS;
+}
+
+export type TtabFile = SimsFile & {
+	meta: SimsFileMeta & { typeId: typeof TYPE_ID.TTAB; };
+	content: TtabContent;
+};
+
+export function isTtabFile(file: SimsFile): file is TtabFile {
+	return file.meta.typeId === TYPE_ID.TTAB;
+}
+
 export type TprpFile = SimsFile & {
 	meta: SimsFileMeta & { typeId: typeof TYPE_ID.TPRP; };
 	content: TprpContent;
@@ -192,12 +240,6 @@ export type TrcnFile = SimsFile & {
 
 export function isTrcnFile(file: SimsFile): file is TrcnFile {
 	return file.meta.typeId === TYPE_ID.TRCN;
-}
-
-export function isStrFile(file: SimsFile): file is StrFile {
-	return file.meta.typeId === TYPE_ID.STR
-		|| file.meta.typeId === TYPE_ID.CTSS
-		|| file.meta.typeId === TYPE_ID.TTAS;
 }
 
 export type BinFile = SimsFile & { content: ArrayBuffer; };

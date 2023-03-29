@@ -1,10 +1,14 @@
 /**
- * NREF file format: just a utf-8 string!
+ * NREF file format: just a utf-8 filename!
  */
+import type {NrefContent} from '../types';
+
 export function deserialize(buf: ArrayBuffer) {
-	return new TextDecoder().decode(buf);
+	return {
+		filename: new TextDecoder().decode(buf),
+	};
 };
 
-export function serialize(str: string) {
-	return new TextEncoder().encode(str);
+export function serialize(data: NrefContent) {
+	return new TextEncoder().encode(data.filename);
 }

@@ -120,7 +120,7 @@ export function serialize(files: SimsFile[]) {
 		} else if (isGlobFile(file)) {
 			serializedFile = GLOB.serialize(file.content);
 		} else if (isNrefFile(file)) {
-			serializedFile = new TextEncoder().encode(file.content).buffer;
+			serializedFile = NREF.serialize(file.content);
 		} else if (isObjdFile(file)) {
 			serializedFile = OBJD.serialize(file.content);
 		} else if (isObjfFile(file)) {

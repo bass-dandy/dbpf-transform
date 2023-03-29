@@ -122,6 +122,10 @@ export type TrcnContent = {
 	}[];
 };
 
+export type NrefContent = {
+	filename: string;
+};
+
 export type SimsFileMeta = {
 	typeId: string;
 	groupId: number;
@@ -135,14 +139,14 @@ export type SimsFileContent =
 	| BconContent
 	| BhavContent
 	| GlobContent
+	| NrefContent
 	| ObjdContent
 	| ObjfContent
 	| StrContent
 	| TtabContent
 	| TprpContent
 	| TrcnContent
-	| ArrayBuffer
-	| string;
+	| ArrayBuffer;
 
 export type SimsFile = {
 	meta: SimsFileMeta;
@@ -178,7 +182,7 @@ export function isGlobFile(file: SimsFile): file is GlobFile {
 
 export type NrefFile = SimsFile & {
 	meta: SimsFileMeta & { typeId: typeof TYPE_ID.NREF; };
-	content: string;
+	content: NrefContent;
 };
 
 export function isNrefFile(file: SimsFile): file is NrefFile {

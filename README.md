@@ -7,11 +7,8 @@ This may or may not work for DBPF files used by other EA games from that era, bu
 ## Usage
 
 ```ts
-import { deserialize, serialize } from 'dbpf-transform';
-
 // it's not necessary to import the type here, this is just for demonstration
-// note: this import style is clunky and subject to change
-import type { SimsFile } from 'dbpf-transform/esm/types/types';
+import { deserialize, serialize, type SimsFile } from 'dbpf-transform';
 
 const inputPackageFile: ArrayBuffer = <an ArrayBuffer representing a .package file>;
 
@@ -210,3 +207,7 @@ type TtabContent = {
 ```
 
 More information about each resource type can be found at [modthesims](https://modthesims.info/wiki.php?title=List_of_Formats_by_Name)
+
+## Exported types
+
+This package exports each resource content type, along with their associated type guards and some other useful types. To see all exported types, [check out the types file](https://github.com/bass-dandy/dbpf-transform/blob/main/src/types.ts)!

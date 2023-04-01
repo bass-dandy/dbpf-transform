@@ -30,38 +30,39 @@ export function deserialize(buf: ArrayBuffer) {
 		locals: reader.readUint8(),
 		headerFlag: reader.readUint8(),
 		treeVersion: reader.readUint32(),
-		cacheFlags: 0,
 		instructions: [],
 	};
-
-	if (bhav.format > 0x8008) {
-		bhav.cacheFlags = reader.readUint8();
-	}
 
 	while (bhav.instructions.length < bhav.count) {
 		const instruction: BhavInstruction = {
 			opcode: reader.readUint16(),
-			addr1: 0,
-			addr2: 0,
-			nodeVersion: 0,
+			gotoOnTrue: 0,
+			gotoOnFalse: 0,
+			nodeVersion: undefined,
+			cacheFlags: undefined,
 			operands: [],
 		};
 
-		if (bhav.format < 0x8007) {
-			instruction.addr1 = reader.readUint8();
-			instruction.addr2 = reader.readUint8();
-		} else {
-			instruction.addr1 = reader.readUint16();
-			instruction.addr2 = reader.readUint16();
-		}
-
 		if (bhav.format < 0x8003) {
-			instruction.operands = reader.readUint8Array(8);
+			instruction.gotoOnTrue  = reader.readUint8();
+			instruction.gotoOnFalse = reader.readUint8();
+			instruction.operands    = reader.readUint8Array(8);
 		} else if (bhav.format < 0x8005) {
-			instruction.operands = reader.readUint8Array(16);
-		} else {
+			instruction.gotoOnTrue  = reader.readUint8();
+			instruction.gotoOnFalse = reader.readUint8();
+			instruction.operands    = reader.readUint8Array(16);
+		} else if (bhav.format < 0x8007) {
+			instruction.gotoOnTrue  = reader.readUint8();
+			instruction.gotoOnFalse = reader.readUint8();
 			instruction.nodeVersion = reader.readUint8();
-			instruction.operands = reader.readUint8Array(16);
+			instruction.operands    = reader.readUint8Array(16);
+		} else {
+			instruction.gotoOnTrue  = reader.readUint16();
+			instruction.gotoOnFalse = reader.readUint16();
+			instruction.nodeVersion = reader.readUint8();
+			instruction.operands    = reader.readUint8Array(16);
+
+			if (bhav.format === 0x8009) instruction.cacheFlags = reader.readUint8();
 		}
 
 		bhav.instructions.push(instruction);
@@ -86,28 +87,27 @@ export function serialize(data: BhavContent) {
 	writer.writeUint8(data.headerFlag);
 	writer.writeUint32(data.treeVersion);
 
-	if (data.format > 0x8008) {
-		writer.writeUint8(data.cacheFlags);
-	}
-
 	for(let i = 0; i < data.count; i++) {
 		const instruction = data.instructions[i];
 
 		writer.writeUint16(instruction.opcode);
 
-		if (data.format < 0x8007) {
-			writer.writeUint8(instruction.addr1);
-			writer.writeUint8(instruction.addr2);
-		} else {
-			writer.writeUint16(instruction.addr1);
-			writer.writeUint16(instruction.addr2);
-		}
-
 		if (data.format < 0x8005) {
+			writer.writeUint8(instruction.gotoOnTrue);
+			writer.writeUint8(instruction.gotoOnFalse);
+			writer.writeUint8Array(instruction.operands);
+		} else if (data.format < 0x8007) {
+			writer.writeUint8(instruction.gotoOnTrue);
+			writer.writeUint8(instruction.gotoOnFalse);
+			writer.writeUint8(instruction.nodeVersion ?? 0);
 			writer.writeUint8Array(instruction.operands);
 		} else {
-			writer.writeUint8(instruction.nodeVersion);
+			writer.writeUint16(instruction.gotoOnTrue);
+			writer.writeUint16(instruction.gotoOnFalse);
+			writer.writeUint8(instruction.nodeVersion ?? 0);
 			writer.writeUint8Array(instruction.operands);
+
+			if (data.format === 0x8009) writer.writeUint8(instruction.cacheFlags ?? 0);
 		}
 	}
 

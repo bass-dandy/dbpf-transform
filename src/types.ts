@@ -9,9 +9,10 @@ export type BconContent = {
 
 export type BhavInstruction = {
 	opcode: number;
-	addr1: number;
-	addr2: number;
-	nodeVersion: number;
+	gotoOnTrue: number;
+	gotoOnFalse: number;
+	nodeVersion?: number;
+	cacheFlags?: number;
 	operands: number[];
 };
 
@@ -24,7 +25,6 @@ export type BhavContent = {
 	locals: number;
 	headerFlag: number;
 	treeVersion: number;
-	cacheFlags: number;
 	instructions: BhavInstruction[];
 };
 
@@ -130,9 +130,10 @@ export type SimsFileMeta = {
 	typeId: string;
 	groupId: number;
 	instanceId: number;
-	instanceId2: number;
+	instanceId2?: number;
 	location: number;
 	size: number;
+	compressed?: boolean;
 };
 
 export type SimsFileContent =

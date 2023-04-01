@@ -1,3 +1,4 @@
+import {decompress} from 'qfs-compression';
 import BufferReader from '../buffer-reader';
 import BufferWriter from '../buffer-writer';
 import {TYPE_ID, getFileType} from '../consts';
@@ -27,8 +28,6 @@ import * as TTAB from '../ttab';
 import * as TPRP from '../tprp';
 import * as TRCN from '../trcn';
 
-// const DIR_TYPE_ID = 'e86b1eef';
-
 function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 	switch(typeId) {
 		case TYPE_ID.BCON: return BCON.deserialize(buffer);
@@ -51,14 +50,32 @@ function deserializeFile(typeId: string, buffer: ArrayBuffer) {
 
 export function deserialize(buf: ArrayBuffer) {
 	const reader = new BufferReader(buf);
+	const decoder = new TextDecoder();
 
-	// skip the first 36 bytes of the header as they're constant
-	reader.seekTo(36);
+	// begin header
+	if (decoder.decode(reader.readBuffer(4)) !== 'DBPF') {
+		throw new Error('Not a DBPF file!');
+	}
 
-	// parse header
+	const versionMajor = reader.readUint32();
+	const versionMinor = reader.readUint32();
+
+	if (versionMajor !== 1 || versionMinor > 1) {
+		throw new Error(`Expected version 1.0 or 1.1 but got ${versionMajor}.${versionMinor}`);
+	}
+
+	// skip to index entry count since everything in between is unused
+	reader.seekTo(32);
+	const indexVersionMajor = reader.readUint32();
 	const indexEntryCount = reader.readUint32();
 	const indexOffset = reader.readUint32();
-	// skip the last bytes of the header as they're also constant
+	reader.seekTo(60);
+	const indexVersionMinor = versionMinor === 1 ? reader.readUint32() : 0;
+
+	if (indexVersionMajor !== 7 || indexVersionMinor > 2) {
+		throw new Error(`Expected index version 7.1 or 7.2 but got ${indexVersionMajor}.${indexVersionMinor}`);
+	}
+	// end header (ignore the remaining bytes of the header as they're unused)
 
 	// parse index table
 	reader.seekTo(indexOffset);
@@ -69,23 +86,67 @@ export function deserialize(buf: ArrayBuffer) {
 			typeId: reader.readUint32().toString(16),
 			groupId: reader.readUint32(),
 			instanceId: reader.readUint32(),
-			instanceId2: reader.readUint32(),
+			instanceId2: indexVersionMinor === 2 ? reader.readUint32() : undefined,
 			location: reader.readUint32(),
 			size: reader.readUint32(),
+			compressed: false,
 		});
 	}
+
+	// check for DIR record and mark compressed files
+	indexedFiles.forEach((meta) => {
+		if (meta.typeId === TYPE_ID.DIR) {
+			const dirEntryCount = meta.size / (indexVersionMinor === 2 ? 20 : 16);
+			let matchCount = 0;
+
+			console.log(`DIR found with ${dirEntryCount} entries`);
+
+			for (let i = 0; i < dirEntryCount; i++) {
+				reader.seekTo(meta.location);
+				const typeId = reader.readUint32().toString(16);
+				const groupId = reader.readUint32();
+				const instanceId = reader.readUint32();
+				const instanceId2 = indexVersionMinor === 2 ? reader.readUint32() : undefined;
+
+				const match = indexedFiles.find((file) => {
+					return file.typeId === typeId
+						&& file.groupId === groupId
+						&& file.instanceId === instanceId
+						&& file.instanceId2 === instanceId2;
+				});
+
+				if (match) {
+					match.compressed = true;
+					matchCount++;
+				}
+			}
+
+			console.log(`found ${matchCount} matching resources out of ${dirEntryCount} DIR entries`);
+		}
+	});
 
 	const files: SimsFile[] = [];
 
 	// deserialize files
 	indexedFiles.forEach((meta) => {
+		if (meta.typeId === TYPE_ID.DIR) return;
+
 		reader.seekTo(meta.location);
 		const buffer = reader.readBuffer(meta.size);
 
-		files.push({
-			meta,
-			content: deserializeFile(meta.typeId, buffer),
-		});
+		if (meta.compressed) {
+			console.log(`decompressing and deserializing ${getFileType(meta.typeId)}`);
+		} else {
+			console.log(`deserializing ${getFileType(meta.typeId)}`);
+		}
+
+		const content =
+			deserializeFile(
+				meta.typeId,
+				meta.compressed ? decompress((new Uint8Array(buffer)).slice(4)).buffer : buffer
+			);
+
+		files.push({ meta, content });
 	});
 
 	return files;
@@ -153,7 +214,7 @@ export function serialize(files: SimsFile[]) {
 		writer.writeUint32(parseInt(meta.typeId, 16));
 		writer.writeUint32(meta.groupId);
 		writer.writeUint32(meta.instanceId);
-		writer.writeUint32(meta.instanceId2);
+		if (meta.instanceId2 !== undefined) writer.writeUint32(meta.instanceId2);
 		writer.writeUint32(meta.location);
 		writer.writeUint32(meta.size);
 	});

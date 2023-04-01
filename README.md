@@ -22,7 +22,7 @@ const outputPackageFile: ArrayBuffer = serialize(resources);
 The output `SimsFile` array is an array of various types of deserialized DBPF resources of the form:
 
 ```ts
-{
+type SimsFile = {
 	meta: {
 		typeId: string;
 		groupId: number;
